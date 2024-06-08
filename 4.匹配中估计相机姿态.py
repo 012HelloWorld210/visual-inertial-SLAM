@@ -52,3 +52,47 @@ def estimate_pose_from_matches(matches, keypoints1, keypoints2):
             return R, t
 
     return None, None
+# 主函数调用：主程序入口点，即添加前端测试样例或接口
+if __name__ == "__main__":
+    # 假组件：替换为实际的检测和描述过程
+    img1 = cv2.imread("image1.jpg", 0)
+    img2 = cv2.imread("image2.jpg", 0)
+    orb = cv2.ORB_create()
+    keypoints1, descriptors1 = orb.detectAndCompute(img1, None)
+    keypoints2, descriptors2 = orb.detectAndCompute(img2, None)
+    bf = cv2.BFMatcher()
+    matches = bf.match(descriptors1, descriptors2)
+    matches = sorted(matches, key=lambda x: x.distance)
+    pts1 = np.float32([keypoints1[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
+    pts2 = np.float32([keypoints2[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
+    M, mask = cv2.findHomography(pts1, pts2, cv2.RANSAC, 5.0)
+    matchesMask = mask.ravel().tolist()
+    ran_pts1 = pts1[matchesMask == 1]
+    ran_pts2 = pts2[matchesMask == 1]
+    ran_pts1 = ran_pts1.reshape(-1, 2)
+    ran_pts2 = ran_pts2.reshape(-1, 2)
+
+    ransac_keypoints1 = []
+    ransac_descriptors1 = []
+    ransac_keypoints2 = []
+    ransac_descriptors2 = []
+    # 保留RANSAC优化后的关键点和描述符
+    for i, m in enumerate(matches):
+        if matchesMask[i]:
+            ransac_keypoints1.append(keypoints1[m.queryIdx])
+            ransac_descriptors1.append(descriptors1[m.queryIdx])
+            ransac_keypoints2.append(keypoints2[m.trainIdx])
+            ransac_descriptors2.append(descriptors2[m.trainIdx])
+    # 将描述符转换回numpy数组
+    ransac_descriptors1 = np.array(ransac_descriptors1)
+    ransac_descriptors2 = np.array(ransac_descriptors2)
+    # 调用主要函数来估计姿态
+    R, t = estimate_pose_from_matches(matches, ransac_keypoints1, ransac_keypoints2)
+
+    if R is not None and t is not None:
+        print("Estimated Rotation:\
+", R)
+        print("Estimated Translation:\
+", t)
+    else:
+        print("Failed to estimate pose.")
