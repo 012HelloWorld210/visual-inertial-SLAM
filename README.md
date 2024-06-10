@@ -8,13 +8,13 @@
 
 ## 概述
 
-<img src="D:\postgraduate\长期事件\Github\visual-inertial-SLAM\image\主程序.png" alt="主程序" style="zoom:30%;" />
+<img src=".\image\主程序.png" alt="主程序" style="zoom:30%;" />
 
 ​	正常处理流程图如上图所示，而本次从零手搓slam也将按照如上流程图进行。
 
 ## 初始化
 
-<img src="D:\postgraduate\长期事件\Github\visual-inertial-SLAM\image\初始化子程序.png" style="zoom:40%;" />
+<img src=".\image\初始化子程序.png" style="zoom:40%;" />
 
 初始化子程序如上图所示，其中，相机预处理为：
 
