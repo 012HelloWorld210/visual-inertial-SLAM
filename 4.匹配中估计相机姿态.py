@@ -2,13 +2,10 @@ import numpy as np
 import cv2
 
 # 计算基础矩阵 F
-def compute_fundamental_matrix(matches, keypoints1, keypoints2):
-    valid_matches = [m for m in matches if m.queryIdx < len(keypoints1) and m.trainIdx < len(keypoints2)]
-    pts1 = np.float32([keypoints1[m.queryIdx].pt for m in valid_matches])
-    pts2 = np.float32([keypoints2[m.trainIdx].pt for m in valid_matches])
-    F, mask = cv2.findFundamentalMat(pts1, pts2, cv2.FM_RANSAC)
+def compute_fundamental_matrix(keypoints1, keypoints2):
+    F, mask = cv2.findFundamentalMat(keypoints1, keypoints2, cv2.FM_RANSAC)
     return F, mask
-
+    # -- 解算基础矩阵需要来自两个
 # 计算本质矩阵 E
 def compute_essential_matrix(F, K):
     E = K.T @ F @ K
@@ -30,8 +27,8 @@ def estimate_pose_from_matches(matches, keypoints1, keypoints2):
 
     if F is not None:
         E = compute_essential_matrix(F, K)
-        pts1 = np.float32([keypoints1[m.queryIdx].pt for m in matches_opt if m.queryIdx < len(keypoints1)])
-        pts2 = np.float32([keypoints2[m.trainIdx].pt for m in matches_opt if m.trainIdx < len(keypoints2)])
+        pts1 = keypoints1
+        pts2 = keypoints2
 
         if E is not None and len(pts1) > 0 and len(pts2) > 0:
             R, t = recover_pose(E, pts1, pts2, K)
@@ -61,12 +58,10 @@ if __name__ == "__main__":
     keypoints1_optimized = np.float32([keypoints1[m.queryIdx].pt for m in good_matches if m.queryIdx < len(keypoints1)])
     keypoints2_optimized = np.float32([keypoints2[m.trainIdx].pt for m in good_matches if m.trainIdx < len(keypoints2)])
 
-    R, t = estimate_pose_from_matches(good_matches, keypoints1, keypoints2)
+    R, t = estimate_pose_from_matches(good_matches, keypoints1_optimized, keypoints2_optimized)
 
     if R is not None and t is not None:
-        print("Estimated Rotation:\
-", R)
-        print("Estimated Translation:\
-", t)
+        print("Estimated Rotation:", R)
+        print("Estimated Translation:", t)
     else:
         print("Failed to estimate pose.")
