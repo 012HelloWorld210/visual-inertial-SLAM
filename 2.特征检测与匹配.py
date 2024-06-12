@@ -2,8 +2,8 @@
 import cv2
 
 ### 读取图像
-img1 = cv2.imread('frame1.png', cv2.IMREAD_GRAYSCALE)
-img2 = cv2.imread('frame2.png', cv2.IMREAD_GRAYSCALE)
+img1 = cv2.imread('image1.jpg', cv2.IMREAD_GRAYSCALE)
+img2 = cv2.imread('image2.jpg', cv2.IMREAD_GRAYSCALE)
     #   - 这两个变量分别保存了读取的 ‘frame1.jpg’ 和 ‘frame2.jpg’ 图像，此处是按灰度图模式读取的图像数据。
 
 ### 使用OpenCV提供的特征检测算法，如SIFT、SURF或ORB。
@@ -34,7 +34,14 @@ matches = sorted(matches, key=lambda x: x.distance)
 
 ###在两幅图像上绘制匹配结果，以便可视化检查
 img_matches = cv2.drawMatches(img1, keypoints1, img2, keypoints2, matches[:100], None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
-cv2.imshow('Matches', img_matches)
+# 创建一个命名窗口
+cv2.namedWindow('RANSAC Matches', cv2.WINDOW_NORMAL)
+
+# 调整窗口大小
+cv2.resizeWindow('RANSAC Matches', 1000, 1000)
+
+# 显示图像
+cv2.imshow('RANSAC Matches', img_matches)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 

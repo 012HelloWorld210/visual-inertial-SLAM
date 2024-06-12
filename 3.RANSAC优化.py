@@ -1,7 +1,7 @@
 # 程序主要在特征检测与匹配的基础上，使用RANSAC对误匹配进行优化
 import cv2
-img1 = cv2.imread('frame1.png', cv2.IMREAD_GRAYSCALE)
-img2 = cv2.imread('frame2.png', cv2.IMREAD_GRAYSCALE)
+img1 = cv2.imread('image1.jpg', cv2.IMREAD_GRAYSCALE)
+img2 = cv2.imread('image2.jpg', cv2.IMREAD_GRAYSCALE)
 orb = cv2.ORB_create()
 keypoints1, descriptors1 = orb.detectAndCompute(img1, None)
 keypoints2, descriptors2 = orb.detectAndCompute(img2, None)
@@ -18,7 +18,7 @@ pts1 = np.float32([ keypoints1[m.queryIdx].pt for m in matches ]).reshape(-1,1,2
 pts2 = np.float32([ keypoints2[m.trainIdx].pt for m in matches ]).reshape(-1,1,2)
     # 此处首先从 matches 获取两张图像匹配的 keypoints，接着读取匹配的坐标，然后转化为浮点型，最后调节为若干个1×2的矩阵。
 # 使用RANSAC估计几何变换矩阵
-M, mask = cv2.findHomography(pts1, pts2, cv2.RANSAC, 5.0)
+M, mask = cv2.findHomography(pts1, pts2, cv2.RANSAC, 12.0)
     # - M：返回的单映射矩阵
     # - mask：匹配点中属于内点的将被标记为1
 matchesMask = mask.ravel().tolist()
@@ -42,6 +42,14 @@ img_ransac_matches = cv2.drawMatches(img1, keypoints1, img2, keypoints2, matches
     # - `matches`：两幅图像之间匹配对集合，通常是通过匹配算法（例如 BFMatcher 或 FLANN）获得的。
     # - `None`：无意义参数，此处通常给None即可。
     # - `**draw_params`：可选的绘制参数集，允许指定一些绘制相关的选项，比如颜色、标注等
+# 创建一个命名窗口
+cv2.namedWindow('RANSAC Matches', cv2.WINDOW_NORMAL)
+
+# 调整窗口大小
+cv2.resizeWindow('RANSAC Matches', 1000, 1000)
+
+# 显示图像
 cv2.imshow('RANSAC Matches', img_ransac_matches)
+
 cv2.waitKey(0)
 cv2.destroyAllWindows()
