@@ -8,7 +8,7 @@
 
 ## 概述
 
-<img src=".\image\主程序.png" alt="主程序" style="zoom: 33%;" />
+<img src=".\image\主程序.png" alt="主程序" width="189" height="704"/>
 
 ​	正常处理流程图如上图所示，而本次从零手搓slam也将按照如上流程图进行。
 
