@@ -32,7 +32,7 @@ def estimate_pose_from_matches(matches, keypoints1, keypoints2):
 
         if E is not None and len(pts1) > 0 and len(pts2) > 0:
             R, t = recover_pose(E, pts1, pts2, K)
-            return R, t
+            return R, t, pts1, pts2
 
     return None, None
 

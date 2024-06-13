@@ -1,32 +1,30 @@
 import cv2
 import numpy as np
+import  4.匹配中估计相机姿态
 
-# 读取图像
-img1 = cv2.imread('image1.jpg', cv2.IMREAD_GRAYSCALE)
-img2 = cv2.imread('image2.jpg', cv2.IMREAD_GRAYSCALE)
+img1 = cv2.imread("image1.jpg", 0)
+img2 = cv2.imread("image2.jpg", 0)
 
-# 检测特征点并匹配
 orb = cv2.ORB_create()
 keypoints1, descriptors1 = orb.detectAndCompute(img1, None)
 keypoints2, descriptors2 = orb.detectAndCompute(img2, None)
 
 bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 matches = bf.match(descriptors1, descriptors2)
+matches = sorted(matches, key=lambda x: x.distance)
 
-# 提取匹配的特征点
-points1 = np.float32([keypoints1[m.queryIdx].pt for m in matches])
-points2 = np.float32([keypoints2[m.trainIdx].pt for m in matches])
-
-# 相机内参矩阵（根据实际相机参数填写）
+points1 = np.float32([keypoints1[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
+points2 = np.float32([keypoints2[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
+M, mask = cv2.findHomography(pts1, pts2, cv2.RANSAC, 12.0)
+matchesMask = mask.ravel().tolist()
+# 此处获取RANSAC优化后的点作为姿态估计的输入
+good_matches = [m for m, valid in zip(matches, matchesMask) if valid]
+keypoints1_optimized = np.float32([keypoints1[m.queryIdx].pt for m in good_matches if m.queryIdx < len(keypoints1)])
+keypoints2_optimized = np.float32([keypoints2[m.trainIdx].pt for m in good_matches if m.trainIdx < len(keypoints2)])
 K = np.array([[800, 0, 320],
               [0, 800, 240],
               [0, 0, 1]], dtype=np.float32)
-
-# 计算本质矩阵
-E, mask = cv2.findEssentialMat(points1, points2, K, method=cv2.RANSAC, prob=0.999, threshold=1.0)
-
-# 从本质矩阵恢复相对姿态
-_, R, t, _ = cv2.recoverPose(E, points1, points2, K)
+R, t = estimate_pose_from_matches(good_matches, keypoints1_optimized, keypoints2_optimized)
 
 # 投影矩阵
 P1 = np.dot(K, np.hstack((np.eye(3), np.zeros((3, 1)))))
