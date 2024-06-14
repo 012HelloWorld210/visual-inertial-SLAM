@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import  4.匹配中估计相机姿态
+
 
 img1 = cv2.imread("image1.jpg", 0)
 img2 = cv2.imread("image2.jpg", 0)
