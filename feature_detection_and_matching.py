@@ -35,20 +35,4 @@ def match_images(image_path1, image_path2, num_matches=10):
     # 绘制匹配结果
     img_matches = cv2.drawMatches(img1, keypoints1, img2, keypoints2, matches[:num_matches], None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
-    return img_matches
-
-# 示例调用
-image_path1 = 'image1.jpg'
-image_path2 = 'image2.jpg'
-matched_image = match_images(image_path1, image_path2)
-
-# 显示结果
-cv2.namedWindow('RANSAC Matches', cv2.WINDOW_NORMAL)
-
-# 调整窗口大小
-cv2.resizeWindow('RANSAC Matches', 1000, 1000)
-
-# 显示图像
-cv2.imshow('RANSAC Matches', matched_image)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    return img1,keypoints1,img2,keypoints2,matches,img_matches
