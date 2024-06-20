@@ -20,13 +20,10 @@ R, t= estimate_pose_from_matches(good_matches, keypoints1_optimized, keypoints2_
 # 投影矩阵
 P1 = np.dot(K, np.hstack((np.eye(3), np.zeros((3, 1)))))
 P2 = np.dot(K, np.hstack((R, t)))
-
 # 三角化
 points1_h = cv2.convertPointsToHomogeneous(keypoints1_optimized)[:, 0, :]
 points2_h = cv2.convertPointsToHomogeneous(keypoints2_optimized)[:, 0, :]
-
 points_4d_hom = cv2.triangulatePoints(P1, P2, keypoints1_optimized.T, keypoints2_optimized.T)
-
 # 转换为非齐次坐标
 points_3d = points_4d_hom / points_4d_hom[3]
 points_3d = points_3d[:3].T

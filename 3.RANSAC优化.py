@@ -46,7 +46,7 @@ img_ransac_matches = cv2.drawMatches(img1, keypoints1, img2, keypoints2, matches
 cv2.namedWindow('RANSAC Matches', cv2.WINDOW_NORMAL)
 
 # 调整窗口大小
-cv2.resizeWindow('RANSAC Matches', 1000, 1000)
+cv2.resizeWindow('RANSAC Matches', 800, 800)
 
 # 显示图像
 cv2.imshow('RANSAC Matches', img_ransac_matches)
